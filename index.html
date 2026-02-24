@@ -402,5 +402,10 @@ if ('serviceWorker' in navigator) {
         document.removeEventListener('click', unlockAudio);
     }, { once: true });
 </script>
+    <script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+    </script>
 </body>
 </html>

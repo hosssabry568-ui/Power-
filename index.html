@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مصحف النور - الإصدار الاحترافي 2026</title>
+<link rel="manifest" href="manifest.json">
+
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #062115; --secondary: #0b2b1d; --accent: #d4af37;
+            --bg-body: #fdfcf6; --text-color: #062115; --card-bg: #ffffff;
+            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .dark-mode {
+            --primary: #020a06; --secondary: #04140e; --bg-body: #020a06;
+            --text-color: #f1f1f1; --card-bg: #0b2b1d;
+        }
+        * { -webkit-tap-highlight-color: transparent; user-select: none; box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-body); color: var(--text-color);
+            font-family: 'Amiri', serif; transition: background 0.5s ease; overflow-x: hidden;
+            background-image: url('https://www.transparenttextures.com/patterns/islamic-art.png');
+        }
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary); z-index: 10000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease;
+        }
+        .splash-logo { font-family: 'Reem Kufi'; font-size: 4em; color: var(--accent); animation: pulse 2s infinite; text-shadow: 0 0 20px rgba(212,175,55,0.5); }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+        #custom-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-200%); background: var(--primary); color: var(--accent); padding: 15px 40px; border-radius: 50px; border: 2px solid var(--accent); z-index: 9999; transition: var(--transition); font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center;}
+        #custom-toast.show { transform: translateX(-50%) translateY(0); }
+        header { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 60px 20px; text-align: center; border-bottom: 5px solid var(--accent); }
+        header h1 { font-family: 'Reem Kufi', sans-serif; font-size: 3.5em; color: var(--accent); margin: 0; }
+        #home-screen { display: flex; flex-direction: column; min-height: 100vh; }
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 30px 20px; margin-top: -40px; flex-grow: 1; }
+        .main-card { background: var(--card-bg); border: 2px solid rgba(212,175,55,0.2); border-radius: 25px; padding: 35px 15px; text-align: center; transition: var(--transition); cursor: pointer; box-shadow: 0 15px 35px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .main-card:active { transform: scale(0.9); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .ayah-frame { animation: fadeInUp 0.4s ease forwards; background: var(--card-bg); margin: 15px; padding: 25px; border-radius: 20px; border-right: 8px solid var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: var(--transition); }
+        .ayah-frame:active { transform: scale(0.95); }
+        .quran-font { font-family: 'Noto Naskh Arabic', serif; font-size: 1.8em; }
+        .ayah-num-gold { color: var(--accent); font-weight: bold; }
+        #content-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 5000; overflow-y: auto; opacity: 0; transform: scale(0.95); transition: var(--transition); }
+        #content-viewer.active { display: block; opacity: 1; transform: scale(1); }
+        .nav-bar { position: sticky; top: 0; background: var(--primary); padding: 15px 20px; display: flex; align-items: center; border-bottom: 3px solid var(--accent); z-index: 100; }
+        .btn-back { background: var(--accent); color: var(--primary); border: none; padding: 10px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .sebha-circle { width: 220px; height: 220px; border-radius: 50%; margin: 30px auto; display: flex; align-items: center; justify-content: center; font-size: 3em; cursor: pointer; transition: all 0.1s; background: radial-gradient(circle at 30% 30%, #0b2b1d, #062115); color: #fff; border: 8px solid var(--accent); box-shadow: 0 15px 0 #04140e, 0 20px 30px rgba(0,0,0,0.4); position: relative; top: 0; }
+        .sebha-circle:active { top: 10px; box-shadow: 0 5px 0 #04140e; }
+        .floating-mode-btn { position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer; }
+
+        #auto-scroll-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--primary); color: var(--accent); border: 2px solid var(--accent); border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 9999; cursor: pointer; font-size: 0.8em; text-align: center; font-weight: bold; }
+        #speed-control { position: fixed; bottom: 100px; right: 35px; width: 50px; height: 150px; display: none; z-index: 9999; flex-direction: column; align-items: center; background: var(--primary); border-radius: 20px; border: 1px solid var(--accent); padding: 10px; }
+        #speed-control input { appearance: slider-vertical; width: 10px; height: 100%; accent-color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div id="splash-screen"><div class="splash-logo">مصحف النور</div><p style="color: white; margin-top: 20px; opacity: 0.7;">بصمة إيمانية رقمية 2026</p></div>
+<div id="custom-toast"></div>
+<div class="floating-mode-btn" onclick="toggleDarkMode()">🌗</div>
+
+<div id="speed-control"><input type="range" min="10" max="100" value="50" oninput="updateSpeed(this.value)"></div>
+<div id="auto-scroll-btn" onclick="toggleAutoScroll()">نزول<br>تلقائي</div>
+
+<div id="home-screen">
+    <header><h1>مصحف النور</h1><p>تطبيقك الإيماني المفضل</p></header>
+    <div class="grid-container">
+        <div class="main-card" onclick="openMod('quran')"><i>📖</i><b>القرآن الكريم</b></div>
+        <div class="main-card" onclick="openMod('azkar')"><i>📿</i><b>الأذكار كاملة</b></div>
+        <div class="main-card" onclick="openMod('prayers')"><i>🕌</i><b>المواقيت</b></div>
+        <div class="main-card" onclick="openMod('tasbih')"><i>🔢</i><b>السبحة</b></div>
+        <div class="main-card" onclick="openMod('reciters')"><i>🎙️</i><b>التلاوات</b></div>
+        <div class="main-card" onclick="openMod('names')"><i>✨</i><b>أسماء الله</b></div>
+        <div class="main-card" style="grid-column: span 2;" onclick="openMod('khatma')"><i>🌟</i><b>الختمة الجماعية</b></div>
+        <div class="main-card" style="grid-column: span 2;" onclick="openMod('azan')"><i>🔔</i><b>الأذان والتنبيهات</b></div>
+    </div>
+</div>
+
+<div id="content-viewer">
+    <div class="nav-bar"><button class="btn-back" onclick="handleExit()">رجوع</button><h2 id="v-title" style="margin:0; flex-grow:1; text-align:center; color:var(--accent); font-family:'Reem Kufi';"></h2></div>
+    <div id="v-body"></div>
+</div>
+
+<audio id="audio-player"></audio>
+<audio id="azan-player" crossorigin="anonymous"></audio>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getMessaging, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBKc0Vu8e1WxyUTmd1dEpGgrKDNOQV9PsY",
+        authDomain: "quranapp-9c312.firebaseapp.com",
+        projectId: "quranapp-9c312",
+        databaseURL: "https://quranapp-9c312-default-rtdb.firebaseio.com/",
+        storageBucket: "quranapp-9c312.firebasestorage.app",
+        messagingSenderId: "708147485092",
+        appId: "1:708147485092:web:ce228b7a245a89f08b0931"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messaging = getMessaging(app);
+
+    window.db = db;
+    window.ref = ref;
+    window.set = set;
+    window.onValue = onValue;
+    window.get = get;
+
+    onMessage(messaging, (payload) => {
+        showToast(`إشعار: ${payload.notification.title}`);
+    });
+</script>
+
+<script>
+    let quranXml = null, isScrolling = false, scrollInterval, scrollSpeed = 50, prayerTimes = null, countdownInterval;
+    let selectedAzan = "https://download.tvquran.com/download/azan/TVQuran.com_Azan_01.mp3";
+
+    // جلب ملف الـ XML للعمل أوفلاين
+    fetch('quran-simple.xml').then(r => r.text()).then(d => { 
+        quranXml = new DOMParser().parseFromString(d, "text/xml"); 
+    }).catch(e => console.log("Offline Mode Active"));
+
+    window.onload = () => { 
+        setTimeout(() => { 
+            document.getElementById('splash-screen').style.opacity = '0'; 
+            setTimeout(() => document.getElementById('splash-screen').style.display = 'none', 1000); 
+        }, 2000); 
+        updatePrayerData(); 
+    };
+
+    const viewer = document.getElementById('content-viewer'), vBody = document.getElementById('v-body'), vTitle = document.getElementById('v-title'), audio = document.getElementById('audio-player'), toast = document.getElementById('custom-toast'), azanAudio = document.getElementById('azan-player');
+    let sCount = 0;
+
+    function toAr(n) { return n.toString().replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]); }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+    function showToast(m) { toast.innerText = m; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000); }
+    function updateSpeed(val) { scrollSpeed = 110 - val; if(isScrolling) { clearInterval(scrollInterval); startScrolling(); } }
+    function toggleAutoScroll() {
+        if(isScrolling) { clearInterval(scrollInterval); isScrolling = false; document.getElementById('auto-scroll-btn').innerHTML = "نزول<br>تلقائي"; showToast("تم الإيقاف"); }
+        else { isScrolling = true; document.getElementById('auto-scroll-btn').innerHTML = "إيقاف"; startScrolling(); showToast("بدء النزول"); }
+    }
+    function startScrolling() { scrollInterval = setInterval(() => { viewer.scrollTop += 1; }, scrollSpeed); }
+
+    function openMod(type) {
+        viewer.style.display = 'block'; setTimeout(() => viewer.classList.add('active'), 10);
+        if(type === 'quran') renderSurahList();
+        if(type === 'tasbih') renderTasbih();
+        if(type === 'prayers') renderPrayers();
+        if(type === 'azkar') renderAzkar();
+        if(type === 'reciters') renderReciters();
+        if(type === 'names') renderNames();
+        if(type === 'azan') renderAzanMod();
+        if(type === 'khatma') renderKhatmaMod();
+    }
+
+    function renderKhatmaMod() {
+        vTitle.innerText = 'الختمة الجماعية';
+        vBody.innerHTML = `
+            <div style="text-align:center; padding-top:50px;">
+                <div style="font-size:2em; color:var(--text-color); margin-bottom:10px;">إنجاز المسلمين حول العالم:</div>
+                <div style="font-size:6em; color:var(--accent); font-weight:bold;" id="global-counter">...</div>
+                <p style="margin-bottom:40px;">سورة تم قراءتها جماعياً</p>
+                <div class="sebha-circle" style="background:var(--accent); color:var(--primary);" onclick="incrementGlobalKhatma()">أنهيت سورة</div>
+            </div>`;
+        const countRef = window.ref(window.db, 'khatma_global/total');
+        window.onValue(countRef, (snapshot) => {
+            const data = snapshot.val() || 0;
+            const gc = document.getElementById('global-counter');
+            if(gc) gc.innerText = toAr(data);
+        });
+    }
+
+    function incrementGlobalKhatma() {
+        const countRef = window.ref(window.db, 'khatma_global/total');
+        window.get(countRef).then((snapshot) => {
+            const current = snapshot.val() || 0;
+            window.set(countRef, current + 1);
+            showToast("تقبل الله منك");
+            if(navigator.vibrate) navigator.vibrate(100);
+        });
+    }
+
+    function handleExit() {
+        clearInterval(scrollInterval); clearInterval(countdownInterval); isScrolling = false;
+        document.getElementById('auto-scroll-btn').style.display = 'none';
+        document.getElementById('speed-control').style.display = 'none';
+        if(vTitle.innerText.includes('سورة') || vTitle.innerText.includes('تلاوة')) renderSurahList();
+        else { viewer.classList.remove('active'); setTimeout(() => viewer.style.display = 'none', 500); }
+        audio.pause();
+    }
+
+    async function renderSurahList() {
+        vTitle.innerText = 'فهرس السور';
+        document.getElementById('auto-scroll-btn').style.display = 'none';
+        document.getElementById('speed-control').style.display = 'none';
+        let html = '<div class="grid-container" style="margin-top:0;">';
+        
+        // المحاولة أولاً من الإنترنت، لو فشل يستخدم XML
+        try {
+            const res = await fetch('https://api.alquran.cloud/v1/surah');
+            const data = await res.json();
+            data.data.forEach(s => { html += `<div class="main-card" onclick="renderAyahs(${s.number}, '${s.name}')"><b>${s.name}</b></div>`; });
+            vBody.innerHTML = html + '</div>';
+        } catch(e) {
+            if(quranXml) {
+                const suras = quranXml.querySelectorAll('sura');
+                suras.forEach(s => { html += `<div class="main-card" onclick="renderAyahs(${s.getAttribute('index')}, '${s.getAttribute('name')}')"><b>${s.getAttribute('name')}</b></div>`; });
+                vBody.innerHTML = html + '</div>';
+            } else {
+                vBody.innerHTML = '<p style="text-align:center; padding:50px;">تحقق من الاتصال أو وجود ملف quran-simple.xml</p>';
+            }
+        }
+    }
+
+    async function renderAyahs(id, name) {
+        vTitle.innerText = 'سورة ' + name;
+        document.getElementById('auto-scroll-btn').style.display = 'flex';
+        document.getElementById('speed-control').style.display = 'flex';
+        vBody.innerHTML = '<p style="text-align:center; padding:50px;">تحميل...</p>';
+
+        try {
+            // محاولة جلب التفسير والصوت من الإنترنت
+            const [ar, tf] = await Promise.all([
+                fetch(`https://api.alquran.cloud/v1/surah/${id}/ar.alafasy`),
+                fetch(`https://api.alquran.cloud/v1/surah/${id}/ar.jalalayn`)
+            ]);
+            const arD = await ar.json(), tfD = await tf.json();
+            let html = '';
+            arD.data.ayahs.forEach((a, i) => {
+                html += `<div class="ayah-frame" onclick="playSaut('${a.audio}', this)">
+                            <div class="quran-font">${a.text} <span class="ayah-num-gold">﴿${toAr(a.numberInSurah)}﴾</span></div>
+                            <div style="margin-top:15px; color:#2d6a4f; border-top:1px solid #eee; padding-top:10px;">${tfD.data.ayahs[i].text}</div>
+                         </div>`;
+            });
+            vBody.innerHTML = html;
+        } catch(e) {
+            // لو مفيش نت، شغل من الـ XML (بدون صوت وتفسير حالياً لعدم وجود ملفاتهم أوفلاين)
+            if(quranXml) {
+                const sura = quranXml.querySelector(`sura[index="${id}"]`), ayahs = sura.querySelectorAll('aya');
+                let fullText = '';
+                ayahs.forEach(a => {
+                    if(a.getAttribute('bismillah')) fullText += `<div style="text-align:center; display:block; margin-bottom:20px; color:var(--accent); font-weight:bold; font-size:1.3em;">${a.getAttribute('bismillah')}</div>`;
+                    fullText += `${a.getAttribute('text')} <span class="ayah-num-gold">﴿${toAr(a.getAttribute('index'))}﴾</span> `;
+                });
+                vBody.innerHTML = `<div class="ayah-frame"><div class="quran-font" style="text-align:justify; line-height:2.2;">${fullText}</div><p style="text-align:center; color:gray; font-size:0.8em; margin-top:20px;">(وضع الأوفلاين: لا يتوفر صوت أو تفسير)</p></div>`;
+            }
+        }
+        viewer.scrollTo(0,0);
+    }
+
+    async function updatePrayerData() {
+        const cached = localStorage.getItem('prayerTimes');
+        if(cached) prayerTimes = JSON.parse(cached);
+        try {
+            const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5');
+            const data = await res.json();
+            prayerTimes = data.data.timings;
+            localStorage.setItem('prayerTimes', JSON.stringify(prayerTimes));
+        } catch(e) { console.log("Using cached prayer times"); }
+    }
+
+    function renderAzanMod() {
+        vTitle.innerText = 'الأذان والتنبيهات';
+        vBody.innerHTML = `
+            <div style="padding:20px;">
+                <div class="ayah-frame" style="text-align:center; background:var(--primary); color:var(--accent);">
+                    <h3 id="next-n">الصلاة القادمة</h3>
+                    <div id="timer" style="font-size:2.5em; font-family:monospace; font-weight:bold;">00:00:00</div>
+                </div>
+                <div class="grid-container" style="margin-top:20px; padding:0;">
+                    <div class="main-card" onclick="setAzan('https://download.tvquran.com/download/azan/TVQuran.com_Azan_01.mp3', 'مكة')">🕋<b>مكة</b></div>
+                    <div class="main-card" onclick="setAzan('https://download.tvquran.com/download/azan/TVQuran.com_Azan_10.mp3', 'المدينة')">🕌<b>المدينة</b></div>
+                    <div class="main-card" onclick="setAzan('https://download.tvquran.com/download/azan/TVQuran.com_Azan_15.mp3', 'القدس')">🇵🇸<b>القدس</b></div>
+                    <div class="main-card" onclick="setAzan('https://download.tvquran.com/download/azan/TVQuran.com_Azan_02.mp3', 'مصر')">🇪🇬<b>مصر</b></div>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button id="btn-play-azan" class="main-card" style="flex:1; background:var(--accent); color:var(--primary); font-weight:bold; border:none; padding:15px;" onclick="playAzanNow()">🔔 تجربة</button>
+                    <button class="main-card" style="flex:1; background:#8b0000; color:white; font-weight:bold; border:none; padding:15px;" onclick="stopAzan()">🛑 إيقاف</button>
+                </div>
+            </div>`;
+        startCountdown();
+    }
+
+    function setAzan(url, name) {
+        selectedAzan = url; azanAudio.src = url; azanAudio.load(); showToast('تم اختيار أذان ' + name);
+    }
+
+    function playAzanNow() {
+        if(!azanAudio.src) azanAudio.src = selectedAzan;
+        azanAudio.play().catch(e => { azanAudio.load(); azanAudio.play(); });
+    }
+
+    function stopAzan() { azanAudio.pause(); azanAudio.currentTime = 0; showToast("تم الإيقاف"); }
+
+    function startCountdown() {
+        const p = {Fajr:'الفجر', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};
+        if(countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+            if(!prayerTime || !document.getElementById('timer')) return;
+            const now = new Date(); let next = null;
+            for(let k in p) {
+                let t = new Date(); const [h,m] = prayerTimes[k].split(':');
+                t.setHours(h,m,0); if(t > now) { next = {n:p[k], t:t}; break; }
+            }
+            if(!next) { 
+                let t = new Date(); t.setDate(t.getDate()+1); 
+                const [h,m] = prayerTimes['Fajr'].split(':'); t.setHours(h,m,0); 
+                next = {n:'الفجر', t:t}; 
+            }
+            let diff = next.t - now;
+            let hh = Math.floor(diff/3600000), mm = Math.floor((diff%3600000)/60000), ss = Math.floor((diff%60000)/1000);
+            document.getElementById('next-n').innerText = "الصلاة القادمة: " + next.n;
+            document.getElementById('timer').innerText = `${hh.toString().padStart(2,'0')}:${mm.toString().padStart(2,'0')}:${ss.toString().padStart(2,'0')}`;
+        }, 1000);
+    }
+
+    function renderAzkar() {
+        vTitle.innerText = 'حصن المسلم';
+        const az = [
+            {t:"أذكار الصباح", d:"أصبحنا وأصبح الملك لله، والحمد لله، لا إله إلا الله وحده لا شريك له."},
+            {t:"أذكار المساء", d:"أمسينا وأمسى الملك لله، والحمد لله، لا إله إلا الله وحده لا شريك له."},
+            {t:"سيد الاستغفار", d:"اللهم أنت ربي لا إله إلا أنت، خلقتني وأنا عبدك، وأنا على عهدك ووعدك ما استطعت."},
+            {t:"دعاء النوم", d:"باسمك ربي وضعت جنبي وبك أرفعه، فإن أمسكت نفسي فارحمها."},
+            {t:"بعد الصلاة", d:"أستغفر الله (3 مرات)، اللهم أنت السلام ومنك السلام، تباركت يا ذا الجلال والإكرام."},
+            {t:"التسبيح", d:"سُبْحَانَ اللَّهِ وَبِحَمْدِهِ (100 مرة)"},
+            {t:"الصلاة على النبي", d:"اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ (10 مرات)"}
+        ];
+        let h = ''; az.forEach(a => { h += `<div class="ayah-frame"><h3>${a.t}</h3><div class="quran-font" style="font-size:1.3em">${a.d}</div></div>`; });
+        vBody.innerHTML = h;
+    }
+
+    function renderNames() {
+        vTitle.innerText = 'أسماء الله الحسنى';
+        const names = ["الرحمن", "الرحيم", "الملك", "القدوس", "السلام", "المؤمن", "المهيمن", "العزيز", "الجبار", "المتكبر", "الخالق", "البارئ", "المصور", "الغفار", "القهار", "الوهاب", "الرزاق", "الفتاح", "العليم", "القابض", "الباسط", "الخافض", "الرافع", "المعز", "المذل", "السميع", "البصير", "الحكم", "العدل", "اللطيف", "الخبير", "الحليم", "العظيم", "الغفور", "الشكور", "العلي", "الكبير", "الحفية", "المقيت", "الحسيب", "الجليل", "الكريم", "الرقيب", "المجيب", "الواسع", "الحكيم", "الودود", "المجيد", "الباعث", "الشهيد", "الحق", "الوكيل", "القوي", "المتين", "الولي", "الحميد", "المحصي", "المبدئ", "المعيد", "المحيي", "المميت", "الحي", "القيوم", "الواجد", "الماجد", "الواحد", "الأحد", "الصمد", "القادر", "المقتدر", "المقدم", "المؤخر", "الأول", "الآخر", "الظاهر", "الباطن", "الوالي", "المتعالي", "البر", "التواب", "المنتقم", "العفو", "الرؤوف", "مالك الملك", "ذو الجلال والإكرام", "المقسط", "الجامع", "الغني", "المغني", "المانع", "الضار", "النافع", "النور", "الهادي", "البديع", "الباقي", "الوارث", "الرشيد", "الصبور"];
+        let html = '<div class="grid-container" style="margin-top:20px;">';
+        names.forEach(n => { html += `<div class="main-card"><b>${n}</b></div>`; });
+        vBody.innerHTML = html + '</div>';
+    }
+
+    function renderTasbih() {
+        vTitle.innerText = 'السبحة الإلكترونية';
+        vBody.innerHTML = `<div style="text-align:center; padding-top:50px;"><div style="font-size:8em; color:var(--accent);" id="sc">${toAr(sCount)}</div><div class="sebha-circle" onclick="sCount++; document.getElementById('sc').innerText=toAr(sCount); if(sCount%33==0) showToast('أحسنت')">سبّح</div><button class="btn-back" style="margin-top:30px" onclick="sCount=0; document.getElementById('sc').innerText='٠'">تصفير</button></div>`;
+    }
+
+    async function renderPrayers() {
+        vTitle.innerText = 'مواقيت الصلاة';
+        if(!prayerTimes) await updatePrayerData();
+        const names = {Fajr:'الفجر', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};
+        let html = '<div style="padding:20px">';
+        for(let k in names) { html += `<div class="main-card" style="display:flex; justify-content:space-between; margin-bottom:15px; padding:25px;"><span>${names[k]}</span><b>${toAr(prayerTimes[k])}</b></div>`; }
+        vBody.innerHTML = html + '</div>';
+    }
+
+    function renderReciters() {
+        vTitle.innerText = 'اختر القارئ';
+        const q = [{n: "ياسر الدوسري", b: "https://server11.mp3quran.net/yasser/"}, {n: "مشاري العفاسي", b: "https://server8.mp3quran.net/afs/"}, {n: "عبدالباسط", b: "https://server7.mp3quran.net/basit/"}, {n: "المنشاوي", b: "https://server10.mp3quran.net/minsh/"}];
+        let h = '<div class="grid-container" style="margin-top:0;">';
+        q.forEach(r => { h += `<div class="main-card" onclick="renderSurahsForReciter('${r.b}', '${r.n}')"><b>${r.n}</b></div>`; });
+        vBody.innerHTML = h + '</div>';
+    }
+
+    async function renderSurahsForReciter(base, rName) {
+        vTitle.innerText = 'تلاوة ' + rName;
+        try {
+            const res = await fetch('https://api.alquran.cloud/v1/surah');
+            const d = await res.json();
+            let h = '<div class="grid-container" style="margin-top:0;">';
+            d.data.forEach(s => { h += `<div class="main-card" onclick="playFullSurah('${base}', ${s.number}, '${s.name}')"><b>${s.name}</b></div>`; });
+            vBody.innerHTML = h + '</div>';
+        } catch(e) { vBody.innerHTML = '<p style="text-align:center; padding:50px;">التلاوات تحتاج اتصال بالإنترنت</p>'; }
+    }
+
+    function playFullSurah(base, sNum, sName) { showToast("جاري تشغيل " + sName); audio.src = `${base}${sNum.toString().padStart(3, '0')}.mp3`; audio.play(); }
+    
+    function playSaut(url, el) { 
+        document.querySelectorAll('.ayah-frame').forEach(f => f.style.background = 'var(--card-bg)'); 
+        el.style.background = '#fcf9e8'; audio.src = url; audio.play(); 
+    }
+
+// تسجيل الـ Service Worker الخارجي للأوفلاين
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("تم تسجيل ملف SW الخارجي بنجاح"))
+            .catch(err => console.error("فشل تسجيل الـ SW:", err));
+    });
+}
+
+
+    document.addEventListener('click', function unlockAudio() {
+        audio.play().then(() => { audio.pause(); audio.currentTime = 0; });
+        azanAudio.play().then(() => { azanAudio.pause(); azanAudio.currentTime = 0; });
+        document.removeEventListener('click', unlockAudio);
+    }, { once: true });
+</script>
+</body>
+</html>

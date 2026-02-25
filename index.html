@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="مصحف النور">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
-<title>مصحف النور ٢٠٢٦</title>
+<title></title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#062115">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet">
@@ -335,7 +335,7 @@ header p{color:rgba(255,255,255,.45);margin-top:4px;font-size:clamp(.8em,3.2vw,.
     <div id="menu-btn" onclick="openSide()">☰</div>
     <div id="search-home-btn" onclick="ck();openMod('search')">🔍</div>
     <h1>مصحف النور</h1>
-    <p>تطبيقك الإيماني المفضل</p>
+    <p></p>
   </header>
 
   <!-- HIJRI BAR -->
@@ -1155,12 +1155,12 @@ function stopScroll(){clearInterval(scrollInv);isScroll=false;G('asbtn').innerHT
 function renderReciters(){
   vTitle.textContent='اختر القارئ';G('player-bar').classList.remove('show');curRecBase=null;curRecName=null;
   const rec=[
-    {n:'ياسر الدوسري',b:'https://server11.mp3quran.net/yasser/',i:'🌟'},
+    {n:'ياسر الدوسري',b:'https://server11.mp3quran.net/yasser/',i:'🎙️'},
     {n:'مشاري العفاسي',b:'https://server8.mp3quran.net/afs/',i:'🎙️'},
-    {n:'عبدالباسط عبدالصمد',b:'https://server7.mp3quran.net/basit/',i:'✨'},
-    {n:'محمد المنشاوي',b:'https://server10.mp3quran.net/minsh/',i:'🎵'},
-    {n:'سعد الغامدي',b:'https://server7.mp3quran.net/s_gmd/',i:'🕌'},
-    {n:'عبدالرحمن السديس',b:'https://server11.mp3quran.net/sds/',i:'🌙'}
+    {n:'عبدالباسط عبدالصمد',b:'https://server7.mp3quran.net/basit/',i:'🎙️'},
+    {n:'محمد المنشاوي',b:'https://server10.mp3quran.net/minsh/',i:'🎙️'},
+    {n:'سعد الغامدي',b:'https://server7.mp3quran.net/s_gmd/',i:'🎙️'},
+    {n:'عبدالرحمن السديس',b:'https://server11.mp3quran.net/sds/',i:'🎙️'}
   ];
   let html='<div class="grid" style="margin-top:16px">';
   rec.forEach(r=>{html+=`<div class="card" onclick="ck();pushNav(renderReciters);loadRecSurahs('${safeAttr(r.b)}','${safeAttr(r.n)}')"><span style="font-size:2em">${r.i}</span><b style="font-size:.9em">${esc(r.n)}</b></div>`;});

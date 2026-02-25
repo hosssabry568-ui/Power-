@@ -2,7 +2,7 @@
    مصحف النور — Service Worker
    ⚠️ غيّر رقم الإصدار هنا في كل تحديث جديد
 ============================================================ */
-const CACHE_VERSION = "v5";
+const CACHE_VERSION = "v6";
 const CACHE_NAME = `alnoor-cache-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
